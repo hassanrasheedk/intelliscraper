@@ -12,6 +12,8 @@ ap.add_argument('-w', '--weights', default='yolov3.weights',
                 help = 'path to yolo pre-trained weights')
 ap.add_argument('-cl', '--classes', default='yolov3.txt',
                 help = 'path to text file containing class names')
+ap.add_argument('-d', '--directory', default="./output/",
+ 				type=str, help='save directory')
 args = ap.parse_args()
 
 
@@ -29,18 +31,24 @@ def draw_prediction(b, img, class_id, confidence, x, y, x_plus_w, y_plus_h):
     label = str(classes[class_id])
 
     color = COLORS[class_id]
-	
-    file_path = '/Users/Fahad/Desktop/IntelliScraper/Images/'+args.query+'/IntelliScraped/'
-    directory = os.path.dirname(file_path)
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-    cv2.imwrite(file_path + image_names[b], img)
+
+	try:
+    	file_path = args.directory+args.query+'/IntelliScraped/'
+		directory = os.path.dirname(file_path)
+		if not os.path.exists(directory):
+			os.makedirs(directory)
+		cv2.imwrite(file_path + image_names[b], img)
+	except FileNotFoundError as e:
+		return print(e)
     
-image_names = os.listdir('/Users/Fahad/Desktop/IntelliScraper/Images/'+args.query)
+image_names = os.listdir(args.directory+args.query)
 
 for b, im in enumerate(image_names):
 	print(im)
-	image = cv2.imread('/Users/Fahad/Desktop/IntelliScraper/Images/'+args.query+'/'+im)
+	try:
+		image = cv2.imread(args.directory+args.query+'/'+im)
+	except FileNotFoundError as e:
+		return print(e)
 	Width = image.shape[1]
 	Height = image.shape[0]
 	scale = 0.00392
